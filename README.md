@@ -1,6 +1,6 @@
 # Disaster Response
 
-An application that classifies emergency messages to their relevant categories based on the text input. This application can be extended to forward the message to its relevant specialized organization.
+An application that classifies emergency messages to their relevant categories based on the text input. This application can be extended to forward the message to its relevant specialized organization. The training data is provided by [Figure Eight](https://appen.com/).
 
 ## Table of contents
 
