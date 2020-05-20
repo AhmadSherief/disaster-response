@@ -1,7 +1,4 @@
 
-# import sys
-
-# print("path", sys.path)
 import json
 import plotly
 import pandas as pd
@@ -13,7 +10,8 @@ from nltk.tokenize import word_tokenize
 
 from flask import Flask
 from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
+from plotly.graph_objs import Bar,Pie
+
 from joblib import load
 from sqlalchemy import create_engine
 
@@ -51,8 +49,14 @@ def index():
     genre_counts = df.groupby("genre").count()["message"]
     genre_names = list(genre_counts.index)
 
-    # create visuals
-    # TODO: Below is an example - modify to create your own visuals
+    related_counts = df.groupby("related").count()['message']/df.shape[0]*100
+    related_names = ['Not related','Related']
+
+    df_categories = df[df['related']==1].drop(['id','message','original','genre','related'],axis=1).sum().sort_values(ascending=False)
+    category_means = df_categories.values
+    category_names = df_categories.index
+
+    # Graphs that will be sent to the rendered html file
     graphs = [
         {
             "data": [Bar(x=genre_names, y=genre_counts)],
@@ -61,7 +65,29 @@ def index():
                 "yaxis": {"title": "Count"},
                 "xaxis": {"title": "Genre"},
             },
-        }
+        },
+        {
+            "data": [Pie(values=related_counts, labels=related_names)],
+            "layout": {
+                "title": "Percentage of disaster related messages",
+                # "yaxis": {"title": "Count"},
+                # "xaxis": {"title": "Genre"},
+            },
+        },
+        {
+            "data": [Bar(x=category_names, y=category_means)],
+            "layout": {
+                "title": "Distribution of Related Message Categories",
+                "yaxis": {"title": "Number of Messages"},
+                "xaxis": {
+                    "automargin": True,
+                    "title": {
+                        "text":"Category",
+                        "standoff" : 20
+                    },
+                    "tickangle": -45,},
+            },
+        },
     ]
 
     # encode plotly graphs in JSON
